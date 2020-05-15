@@ -1,0 +1,50 @@
+menuconfig LIBTFLITE
+    bool "TensorFlowLite - tensorflow lite library"
+    select LIBCXX
+    select LIBNEWLIBC
+    select LIBPOSIX_SYSINFO
+    select LIBPTHREAD_EMBEDDED
+    select LIBCOMPILTER_RT
+    select LIBCOMPILER_RT_ATOMIC
+    select LIBEIGEN
+    select LIBFFT2D
+    select LIBFLATBUFFERS
+    select LIBGEMMLOWP
+    select LIBFARMHASH
+    select LIBUK9P
+    select LIB9PFS
+    select LIBDEVFS
+    select LIBDEVFS_AUTOMOUNT
+    select LIBVFSCORE_AUTOMOUNT_ROOTFS
+    select LIBUKLIBPARAM
+    default n
+
+if LIBTFLITE
+    choice LIBVFSCORE_ROOTFS
+    default LIBVFSCORE_ROOTFS_9PFS
+    endchoice
+endif
+
+if LIBTFLITE
+    config LIBTFLITE_EIGEN_DONT_ALIGN
+    bool "Do not align the buffers used by eigen library"
+    default y
+endif
+
+if LIBTFLITE
+    config LIBTFLITE_BUILD_WITH_RUY
+    bool "Matrix multiplication library"
+    default y
+endif
+
+if LIBTFLITE
+    config LIBTFLITE_BUILD_WITH_NNAPI
+    bool "Build with Neural Network API"
+    default n
+endif
+
+if LIBTFLITE
+    config LIBTFLITE_MAIN_FUNCTION
+	bool "Provide main function"
+	default y
+endif
