@@ -1,0 +1,47 @@
+From f34b41fd728c06517a1223178af2fbb97dce5dfe Mon Sep 17 00:00:00 2001
+From: George Muraru <murarugeorgec@gmail.com>
+Date: Tue, 21 Apr 2020 23:16:50 +0300
+Subject: [PATCH 1/1] Change zu to lu
+
+---
+ tensorflow/lite/optional_debug_tools.cc | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tensorflow/lite/optional_debug_tools.cc b/tensorflow/lite/optional_debug_tools.cc
+index a59af3d..c9339b0 100644
+--- a/tensorflow/lite/optional_debug_tools.cc
++++ b/tensorflow/lite/optional_debug_tools.cc
+@@ -80,7 +80,7 @@ const char* AllocTypeName(TfLiteAllocationType type) {
+ 
+ // Prints a dump of what tensors and what nodes are in the interpreter.
+ void PrintInterpreterState(Interpreter* interpreter) {
+-  printf("Interpreter has %zu tensors and %zu nodes\n",
++  printf("Interpreter has %lu tensors and %lu nodes\n",
+          interpreter->tensors_size(), interpreter->nodes_size());
+   printf("Inputs:");
+   PrintIntVector(interpreter->inputs());
+@@ -90,7 +90,7 @@ void PrintInterpreterState(Interpreter* interpreter) {
+   for (size_t tensor_index = 0; tensor_index < interpreter->tensors_size();
+        tensor_index++) {
+     TfLiteTensor* tensor = interpreter->tensor(static_cast<int>(tensor_index));
+-    printf("Tensor %3zu %-20s %10s %15s %10zu bytes (%4.1f MB) ", tensor_index,
++    printf("Tensor %3lu %-20s %10s %15s %10lu bytes (%4.1f MB) ", tensor_index,
+            tensor->name, TensorTypeName(tensor->type),
+            AllocTypeName(tensor->allocation_type), tensor->bytes,
+            (static_cast<float>(tensor->bytes) / (1 << 20)));
+@@ -104,10 +104,10 @@ void PrintInterpreterState(Interpreter* interpreter) {
+     const TfLiteNode& node = node_and_reg->first;
+     const TfLiteRegistration& reg = node_and_reg->second;
+     if (reg.custom_name != nullptr) {
+-      printf("Node %3zu Operator Custom Name %s\n", node_index,
++      printf("Node %3lu Operator Custom Name %s\n", node_index,
+              reg.custom_name);
+     } else {
+-      printf("Node %3zu Operator Builtin Code %3d\n", node_index,
++      printf("Node %3lu Operator Builtin Code %3d\n", node_index,
+              reg.builtin_code);
+     }
+     printf("  Inputs:");
+-- 
+2.17.1
+
