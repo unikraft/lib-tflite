@@ -1,0 +1,167 @@
+#  libtensorflow-lite Makefile.uk
+#
+#  Authors: George Muraru <murarugeorgec@gmail.com>
+#
+#  Copyright (c) 2020, Politehnica University of Bucharest. All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions
+#  are met:
+#
+#  1. Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#  2. Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#  3. Neither the name of the copyright holder nor the names of its
+#     contributors may be used to endorse or promote products derived from
+#     this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+#  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+#  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+#  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+#  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+#  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+#  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#  POSSIBILITY OF SUCH DAMAGE.
+#
+#  THIS HEADER MAY NOT BE EXTRACTED OR MODIFIED IN ANY WAY.
+#
+
+$(eval $(call addlib_s,libtflite,$(CONFIG_LIBTFLITE)))
+
+################################################################################
+# Sources
+################################################################################
+LIBTFLITE_VERSION=2.0.1
+LIBTFLITE_PATCHDIR=$(LIBTFLITE_BASE)/patches
+
+LIBTFLITE_URL=https://github.com/tensorflow/tensorflow/archive/v$(LIBTFLITE_VERSION).tar.gz
+$(eval $(call fetch,libtflite,$(LIBTFLITE_URL)))
+$(eval $(call patch,libtflite,$(LIBTFLITE_PATCHDIR),tensorflow-$(LIBTFLITE_VERSION)))
+
+################################################################################
+# Helpers
+################################################################################
+LIBTFLITE_SUBDIR=tensorflow-$(LIBTFLITE_VERSION)
+LIBTFLITE_SRC = $(LIBTFLITE_ORIGIN)/$(LIBTFLITE_SUBDIR)
+
+################################################################################
+# Library includes
+################################################################################
+CXXINCLUDES-$(CONFIG_LIBTFLITE) += -I$(LIBTFLITE_SRC)/
+CXXINCLUDES-$(CONFIG_LIBTFLITE) += -I$(LIBTFLITE_SRC)/tensorflow/lite
+
+
+CINCLUDES-$(CONFIG_LIBTFLITE) += -I$(LIBTFLITE_SRC)/
+CINCLUDES-$(CONFIG_LIBTFLITE) += -I$(LIBTFLITE_SRC)/tensorflow/lite
+
+################################################################################
+# Main code
+################################################################################
+
+ifdef CONFIG_LIBTFLITE_MAIN_FUNCTION
+LIBTFLITE_SRCS-$(CONFIG_LIBTFLITE_MAIN_FUNCTION) += $(LIBTFLITE_BASE)/main.cpp
+endif
+
+################################################################################
+# Global flags
+################################################################################
+LIBTFLITE_SUPPRESS_FLAGS += -Wno-sign-compare -Wno-unused-parameter -Wno-comment \
+                            -Wno-missing-field-initializers -Wno-parantheses \
+                            -Wno-unused-function -Wno-unknown-pragmas
+
+LIBTFLITE_CXXFLAGS-y += $(LIBTFLITE_SUPPRESS_FLAGS)
+LIBTFLITE_CFLAGS-y += $(LIBTFLITE_SUPPRESS_FLAGS)
+
+ifdef CONFIG_LIBTFLITE_BUILD_WITH_RUY
+LIBTFLITE_CXXFLAGS-y += -D TFLITE_WITH_RUY
+LIBTFLITE_CFLAGS-y += -D TFLITE_WITH_RUY
+endif
+
+ifdef CONFIG_LIBTFLITE_EIGEN_DONT_ALIGN
+LIBTFLITE_CXXFLAGS-y += -D EIGEN_DONT_ALIGN
+LIBTFLITE_CFLAGS-y += -D EIGEN_DONT_ALIGN
+endif
+
+################################################################################
+# Library sources
+################################################################################
+MINIMAL_SRCS := $(LIBTFLITE_SRC)/tensorflow/lite/examples/minimal/minimal.cc
+
+
+CORE_CC_ALL_SRCS := \
+            $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/*.cc) \
+            $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/*.c) \
+            $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/c/*.c) \
+            $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/core/*.cc) \
+            $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/core/api/*.cc) \
+            $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/experimental/resource_variable/*.cc) \
+            $(LIBTFLITE_SRC)/tensorflow/lite/experimental/ruy/allocator.cc \
+            $(LIBTFLITE_SRC)/tensorflow/lite/experimental/ruy/block_map.cc \
+            $(LIBTFLITE_SRC)/tensorflow/lite/experimental/ruy/blocking_counter.cc \
+            $(LIBTFLITE_SRC)/tensorflow/lite/experimental/ruy/context.cc \
+            $(LIBTFLITE_SRC)/tensorflow/lite/experimental/ruy/detect_dotprod.cc \
+            $(LIBTFLITE_SRC)/tensorflow/lite/experimental/ruy/kernel_arm32.cc \
+            $(LIBTFLITE_SRC)/tensorflow/lite/experimental/ruy/kernel_arm64.cc \
+            $(LIBTFLITE_SRC)/tensorflow/lite/experimental/ruy/pack_arm.cc \
+            $(LIBTFLITE_SRC)/tensorflow/lite/experimental/ruy/pmu.cc \
+            $(LIBTFLITE_SRC)/tensorflow/lite/experimental/ruy/thread_pool.cc \
+            $(LIBTFLITE_SRC)/tensorflow/lite/experimental/ruy/trace.cc \
+            $(LIBTFLITE_SRC)/tensorflow/lite/experimental/ruy/trmul.cc \
+            $(LIBTFLITE_SRC)/tensorflow/lite/experimental/ruy/tune.cc \
+            $(LIBTFLITE_SRC)/tensorflow/lite/experimental/ruy/wait.cc \
+            $(LIBTFLITE_SRC)/tensorflow/lite/minimal_logging_default.cc
+
+
+
+CORE_CC_ALL_SRCS += \
+             $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/kernels/*.cc) \
+             $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/kernels/internal/*.cc) \
+             $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/kernels/internal/optimized/*.cc) \
+             $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/kernels/internal/reference/*.cc)
+
+
+CORE_CC_ALL_SRCS := $(sort $(CORE_CC_ALL_SRCS))
+CORE_CC_EXCLUDE_SRCS := \
+                $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/*test.cc) \
+                $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/*/*test.cc) \
+                $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/*/*/*test.cc) \
+                $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/*/*/*/*test.cc) \
+                $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/kernels/*test_main.cc) \
+                $(wildcard $(LIBTFLITE_SRC)/tensorflow/lite/kernels/*test_util.cc) \
+                $(LIBTFLITE_SRC)/tensorflow/lite/experimental/ruy/pmu.cc \
+                $(LIBTFLITE_SRC)/tensorflow/lite/minimal_logging_android.cc \
+                $(LIBTFLITE_SRC)/tensorflow/lite/minimal_logging_ios.cc \
+                $(MINIMAL_SRCS)
+
+
+COMPILE_MANUAL_SRCS := \
+                $(LIBTFLITE_SRC)/tensorflow/lite/kernels/internal/mfcc.cc \
+                $(LIBTFLITE_SRC)/tensorflow/lite/kernels/mfcc.cc
+
+
+ifeq ($(CONFIG_LIBUKMMAP),y)
+CORE_CC_EXCLUDE_SRCS += $(LIBTFLITE_SRC)/tensorflow/lite/mmap_allocation_disabled.cc
+else
+CORE_CC_EXCLUDE_SRCS += $(LIBTFLITE_SRC)/tensorflow/lite/mmap_allocation.cc
+endif
+
+ifeq ($(LIBTFLITE_BUILD_WITH_NNAPI),y)
+CORE_CC_ALL_SRCS += \
+                $(LIBTFLITE_SRC)/tensorflow/lite/delegates/nnapi/nnapi_delegate.cc \
+                $(LIBTFLITE_SRC)/tensorflow/lite/delegates/nnapi/quant_lstm_sup.cc \
+                $(LIBTFLITE_SRC)/tensorflow/lite/nnapi/nnapi_implementation.cc
+else
+CORE_CC_ALL_SRCS += \
+                $(LIBTFLITE_SRC)/tensorflow/lite/delegates/nnapi/nnapi_delegate_disabled.cc \
+                $(LIBTFLITE_SRC)/tensorflow/lite/nnapi/nnapi_implementation_disabled.cc
+endif
+
+LIBTFLITE_SRCS-y += $(filter-out $(CORE_CC_EXCLUDE_SRCS) $(COMPILE_MANUAL_SRCS), $(CORE_CC_ALL_SRCS))
+LIBTFLITE_SRCS-y += $(LIBTFLITE_SRC)/tensorflow/lite/kernels/internal/mfcc.cc|internal
+LIBTFLITE_SRCS-y += $(LIBTFLITE_SRC)/tensorflow/lite/kernels/mfcc.cc|kernels
