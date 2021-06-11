@@ -19,7 +19,7 @@ be added to `Makefile` in this order:
 * `libflatbuffers`
 * `libfarmhash`
 * `libeigen`
-* `libfft2`
+* `libfft2d`
 
 ## Root filesystem
 ### Creating the filesystem
