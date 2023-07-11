@@ -1,0 +1,6 @@
+name        := "tflite"
+description := "A free and open-source software library for machine learning and artificial intelligence."
+gitrepo     := "https://github.com/tensorflow/tensorflow.git"
+homepage    := "https://www.tensorflow.org/"
+license     := "Apache-2.0"
+version     := 2.0.1 29197d30923b9670992ee4b9c6161f50c7452e9a4158c720746e846080ac245a https://github.com/tensorflow/tensorflow/archive/v2.0.1.tar.gz
